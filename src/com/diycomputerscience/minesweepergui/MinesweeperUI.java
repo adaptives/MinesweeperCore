@@ -4,6 +4,7 @@
 package com.diycomputerscience.minesweepergui;
 
 import java.awt.Color;
+
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,8 +13,10 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+//import javax.swing.JDialog;
 
 import com.diycomputerscience.minesweepercore.Board;
 import com.diycomputerscience.minesweepercore.Point;
@@ -35,7 +38,8 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 	private JButton gridArr[][] = new JButton[row][col];
 	private JPanel panel;
 	private Board mineBoard;
-
+	private int option =0;
+	
 	public MinesweeperUI() {
 		this.setTitle("Minesweeper");
 
@@ -107,17 +111,30 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 							
 						} catch (UncoveredMineException ue) 
 						{
-							System.out.println("UnCovered Exception : " + ue);
+	
 						}
 						if (mineBoard.isSquareMine(new Point(i, j))) {
 							// Exit the game
-							System.exit(ERROR);
-						} else {
+							
+							option = JOptionPane.showConfirmDialog(this,"You have Lost The Game,want to play again","Really Quit",JOptionPane.YES_NO_OPTION);
+							if(option == JOptionPane.NO_OPTION)
+								System.exit(ERROR);
+							else
+							{
+								this.dispose();
+								MinesweeperUI MUI = new MinesweeperUI();
+							}
+							
+						} else
+						 {
 							// not a mine so display its count
 							((JButton) me.getComponent()).setBackground(new Color(255, 255, 255));
 							((JButton) me.getComponent()).setEnabled(false);
-							gridArr[i][j].setText(""+ mineBoard.fetchSquareCount(new Point(i, j)));
-
+							if(mineBoard.fetchSquareCount(new Point(i, j))!=0)
+								gridArr[i][j].setText(""+ mineBoard.fetchSquareCount(new Point(i, j)));
+							else
+								//The MineCount is Zero 
+								this.zeroMine(i, j);
 						}
 					}
 
@@ -160,10 +177,622 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 		});
 
 	}// addWindowListener()
+	
+	private void zeroMine(int row,int col)
+	{
+		if(row == 0 && col == 0)
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{	
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+				
+			}
+				
+			if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+			{	
+				if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+					zeroMine(row+1, col);
+				else
+				{
+					gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+				 
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row+1][col+1].getComponentAt(row+1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col+1)) == 0)
+					zeroMine(row+1, col+1);
+				else
+				{
+					gridArr[row+1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col+1)));
+				 
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setEnabled(false);
+				}
+				
+			}
+			return;
+		}
+		
+		
+		if(row ==0 && col == Board.MAX_COLS-1)
+		{
+				gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+				((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+				((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+				
+				if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+				{
+					if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+						zeroMine(row, col-1);
+					else
+					{
+						gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+						((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+						((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+					}
+					
+				}
+				
+				if(gridArr[row+1][col-1].getComponentAt(row+1,col-1).isEnabled())
+				{
+					if(mineBoard.fetchSquareCount(new Point(row+1, col-1)) == 0)
+						zeroMine(row+1, col-1);
+					else
+					{
+						gridArr[row+1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col-1)));
+					 
+						((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setBackground(new Color(255, 255, 255));
+						((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setEnabled(false);
+					}
+					
+				}
+				
+				if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+				{
+					if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+						zeroMine(row+1, col);
+					else
+					{
+						gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+					 
+						((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+						((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+					}
+					
+				}
+				
+				return;
+			}
+		if(row == 0 && (col > 0 && col <= ( Board.MAX_COLS-2)) )
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+					zeroMine(row, col-1);
+				else
+				{
+					gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row+1][col-1].getComponentAt(row+1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col-1)) == 0)
+					zeroMine(row+1, col-1);
+				else
+				{
+					gridArr[row+1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col-1)));
+				 	((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+					zeroMine(row+1, col);
+				else
+				{
+					gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+				 	((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+				 	((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row+1][col+1].getComponentAt(row+1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col+1)) == 0)
+					zeroMine(row+1, col+1);
+				else
+				{
+					gridArr[row+1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col+1)));
+				 
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setEnabled(false);
+				}
+				
+			}
+			return;
+		}
+		if((row <=(Board.MAX_ROWS-2)&& row > 0) && col == 0)
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+				
+			}
+				
+			if(gridArr[row-1][col+1].getComponentAt(row-1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col+1)) == 0)
+					zeroMine(row-1, col+1);
+				else
+				{
+					gridArr[row-1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col+1)));
+					 
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					 
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+					zeroMine(row+1, col);
+				else
+				{
+					gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+					 
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row+1][col+1].getComponentAt(row+1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col+1)) == 0)
+					zeroMine(row+1, col+1);
+				else
+				{
+					gridArr[row+1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col+1)));
+					 
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setEnabled(false);
+				}
+				
+			}
+			
+			return;
+		}
+		if(row ==(Board.MAX_ROWS-1) && col == 0)
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row-1][col+1].getComponentAt(row-1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col+1)) == 0)
+					zeroMine(row-1, col+1);
+				else
+				{
+					gridArr[row-1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col+1)));
+					 
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setEnabled(false);
+				}
+				
+			}
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					 
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+				
+			}
+			return;
+		}
+		if(row ==(Board.MAX_ROWS-1) &&( col > 0 && col <= Board.MAX_COLS-2))
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col-1].getComponentAt(row-1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col-1)) == 0)
+					zeroMine(row-1, col-1);
+				else
+				{
+					gridArr[row-1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col-1)));
+					 
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row-1][col+1].getComponentAt(row-1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col+1)) == 0)
+					zeroMine(row-1, col+1);
+				else
+				{
+					gridArr[row-1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col+1)));
+					 
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+			{
+			
+				if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+					zeroMine(row, col-1);
+				else
+				{
+					gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+				}
+			
+			}
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{
+			
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					 
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+			
+			}
+			return;
+		}
+		if(row ==(Board.MAX_ROWS-1) && col == (Board.MAX_COLS-1))
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col-1].getComponentAt(row-1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col-1)) == 0)
+					zeroMine(row-1, col-1);
+				else
+				{
+					gridArr[row-1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col-1)));
+					 
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+				
+			}
+			
+			if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+					zeroMine(row, col-1);
+				else
+				{
+					gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+				}
+				
+			}
+			
+			return;
+		}
+		if((row <=(Board.MAX_ROWS-2 ) && row >0) && col == (Board.MAX_COLS-1))//**check this cond
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col-1].getComponentAt(row-1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col-1)) == 0)
+					zeroMine(row-1, col-1);
+				else
+				{
+					gridArr[row-1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col-1)));
+					 
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setEnabled(false);
+				}
+			}
+			
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+			}
+			
+			if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+					zeroMine(row, col-1);
+				else
+				{
+					gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+				}
+			
+			}
+			
+			if(gridArr[row+1][col-1].getComponentAt(row+1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col-1)) == 0)
+					zeroMine(row+1, col-1);
+				else
+				{
+					gridArr[row+1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col-1)));
+					 
+					((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setEnabled(false);
+				}
+			
+			}
+			
+			if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+					zeroMine(row+1, col);
+				else
+				{
+					gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+					 
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+				}
+			
+			}
+			
+			return;
+		}
+		if((row <=(Board.MAX_ROWS-2) && row > 0) && (col <= (Board.MAX_COLS-2) && col > 0))
+		{
+			gridArr[row][col].setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setBackground(new Color(255, 255, 255));
+			((JButton) gridArr[row][col].getComponentAt(row,col)).setEnabled(false);
+			if(gridArr[row-1][col-1].getComponentAt(row-1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col-1)) == 0)
+					zeroMine(row-1, col-1);
+				else
+				{
+					gridArr[row-1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col-1)));
+					 
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col-1].getComponentAt(row-1,col-1)).setEnabled(false);
+				}
+			
+			}
+			
+			if(gridArr[row-1][col].getComponentAt(row-1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col)) == 0)
+					zeroMine(row-1, col);
+				else
+				{
+					gridArr[row-1][col].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col)));
+					 
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col].getComponentAt(row-1,col)).setEnabled(false);
+				}
+			
+			}
+			
+			if(gridArr[row-1][col+1].getComponentAt(row-1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row-1, col+1)) == 0)
+					zeroMine(row-1, col+1);
+				else
+				{
+					gridArr[row-1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row-1, col+1)));
+					 
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row-1][col+1].getComponentAt(row-1,col+1)).setEnabled(false);
+				}
+			
+			}
+			if(gridArr[row][col+1].getComponentAt(row,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col+1)) == 0)
+					zeroMine(row, col+1);
+				else
+				{
+					gridArr[row][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row, col+1)));
+					 
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col+1].getComponentAt(row,col+1)).setEnabled(false);
+				}
+			
+			}
+			if(gridArr[row][col-1].getComponentAt(row,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row, col-1)) == 0)
+					zeroMine(row, col-1);
+				else
+				{
+					gridArr[row][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row, col-1)));
+					 
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row][col-1].getComponentAt(row,col-1)).setEnabled(false);
+				}
+			
+			}
+			
+			if(gridArr[row+1][col+1].getComponentAt(row+1,col+1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col+1)) == 0)
+					zeroMine(row+1, col+1);
+				else
+				{
+					gridArr[row+1][col+1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col+1)));
+					 
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col+1].getComponentAt(row+1,col+1)).setEnabled(false);
+				}
+			
+			}
+			if(gridArr[row+1][col-1].getComponentAt(row+1,col-1).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col-1)) == 0)
+					zeroMine(row+1, col-1);
+				else
+				{
+					gridArr[row+1][col-1].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col-1)));
+					 
+					((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col-1].getComponentAt(row+1,col-1)).setEnabled(false);
+				}
+			
+			}
+			if(gridArr[row+1][col].getComponentAt(row+1,col).isEnabled())
+			{
+				if(mineBoard.fetchSquareCount(new Point(row+1, col)) == 0)
+					zeroMine(row+1, col);
+				else
+				{
+					gridArr[row+1][col].setText(""+mineBoard.fetchSquareCount(new Point(row+1, col)));
+					 
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setBackground(new Color(255, 255, 255));
+					((JButton) gridArr[row+1][col].getComponentAt(row+1,col)).setEnabled(false);
+				}
+			
+			}
+			return;
+		}
+		
+	}//zeroMine()
 
 	public static void main(String args[]) {
 		// Create a JFrame and init it here
 		MinesweeperUI MUI = new MinesweeperUI();
+		
+		
 
 	}
 }
