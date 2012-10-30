@@ -5,6 +5,7 @@ package com.diycomputerscience.minesweepergui;
 
 import java.awt.Color;
 
+
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -16,7 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-//import javax.swing.JDialog;
+
 
 import com.diycomputerscience.minesweepercore.Board;
 import com.diycomputerscience.minesweepercore.Point;
@@ -35,15 +36,16 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 1L;
 	final int row = 6;
 	final int col = 6;
-	private JButton gridArr[][] = new JButton[row][col];
-	private JPanel panel;
-	private Board mineBoard;
+	
+	private static JButton gridArr[][];
+	private  static Board mineBoard;
+	
 	private int option =0;
 	
 	public MinesweeperUI() {
 		this.setTitle("Minesweeper");
-
-		this.mineBoard = new Board(new RandomBoardInitializer());
+		this.setLayout(new GridLayout(1, 1));
+		mineBoard = new Board(new RandomBoardInitializer());
 		this.setMineLayout();
 		this.addWindowListener();
 		
@@ -54,6 +56,9 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 	 * the grid
 	 */
 	private void setMineLayout() {
+		JPanel panel;
+		
+		
 		this.setSize(300, 300);
 		this.setVisible(true);
 		panel = new JPanel();
@@ -61,24 +66,34 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 
 		/** In this for loop create the Buttons and populate the Button Array */
 		JButton gridButton;
+
+		gridArr = new JButton[row][col];
+		
 		for (int i = 0; i < row; i++) {
 			for (int j = 0; j < col; j++) {
 				gridButton = new JButton("");
+				gridButton.setName(i+","+j);
 				gridArr[i][j] = gridButton;
+				
 			}
 		}
-		this.addGridButtons();
-		this.addGridMouseListener();
-		this.add(panel);
-		this.validate();
+		
 
+		this.addGridButtons(panel);
+		this.addGridMouseListener();
+		this.getContentPane().add(panel);
+		this.validate();
+		
 	}// setMineLayout()
 
 	/** This method adds the JButtons array to the Panel on the JFrame */
-	private void addGridButtons() {
+	private void addGridButtons(JPanel panel) {
+		
 		for (int i = 0; i < row; i++) {
 			for (int j = 0; j < col; j++)
 				panel.add(gridArr[i][j]);
+			
+				
 		}
 	}
 
@@ -91,64 +106,75 @@ public class MinesweeperUI extends JFrame implements MouseListener {
 			for (int j = 0; j < col; j++)
 				gridArr[i][j].addMouseListener(this);
 		}
+	
 	}// addGridMouseListener()
-
+	
+	
 	@Override
 	public void mouseEntered(MouseEvent me) {
 
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent me) {
-		for (int i = 0; i < gridArr.length; i++)
-			for (int j = 0; j < gridArr[0].length; j++) {
-				if ((me.getComponent()).equals(gridArr[i][j])) {
+	public void mouseClicked(MouseEvent me) 
+	{
+		
+		String buttonName = ((JButton)me.getComponent()).getName();
+		StringBuffer strbuff = new StringBuffer(buttonName);
+		int index = strbuff.indexOf(",");
+		int i = Integer.parseInt(((String)strbuff.substring(0,index)));
+		int j = Integer.parseInt(((String)strbuff.substring(index+1)).toString());
 
-					if (SwingUtilities.isLeftMouseButton(me)) {
-						try {
-							
-							mineBoard.uncoverSquare(new Point(i, j));
-							
-						} catch (UncoveredMineException ue) 
-						{
-	
-						}
-						if (mineBoard.isSquareMine(new Point(i, j))) {
-							// Exit the game
-							
-							option = JOptionPane.showConfirmDialog(this,"You have Lost The Game,want to play again","Really Quit",JOptionPane.YES_NO_OPTION);
-							if(option == JOptionPane.NO_OPTION)
-								System.exit(ERROR);
-							else
-							{
-								this.dispose();
-								MinesweeperUI MUI = new MinesweeperUI();
-							}
-							
-						} else
-						 {
-							// not a mine so display its count
-							((JButton) me.getComponent()).setBackground(new Color(255, 255, 255));
-							((JButton) me.getComponent()).setEnabled(false);
-							if(mineBoard.fetchSquareCount(new Point(i, j))!=0)
-								gridArr[i][j].setText(""+ mineBoard.fetchSquareCount(new Point(i, j)));
-							else
-								//The MineCount is Zero 
-								this.zeroMine(i, j);
-						}
-					}
-
-					else {
-						// if rightButton clicked
-						if (SwingUtilities.isRightMouseButton(me))
-							((JButton) me.getComponent()).setBackground(new Color(255, 0, 0));
-
-					}
-					return;
-				}// if component matches
+		if (SwingUtilities.isLeftMouseButton(me)) 
+		{
+			try
+			{
+						
+				mineBoard.uncoverSquare(new Point(i, j));
+				
+			} catch (UncoveredMineException ue) 
+			{					
+				
 			}
+			if (mineBoard.isSquareMine(new Point(i, j))) 
+			{
+			
+				// Exit the game
+				option = JOptionPane.showConfirmDialog(this,"You have Lost The Game,want to play again","Really Quit",JOptionPane.YES_NO_OPTION);
+				if(option == JOptionPane.NO_OPTION)
+					this.dispose();
+				else
+				{
+					
+					this.getContentPane().removeAll();
+					mineBoard = new Board(new RandomBoardInitializer());
+					this.setMineLayout();
+					this.addWindowListener();
+					this.invalidate();
+					
+				}
+			}
+			else
+			 {
+				// not a mine so display its count
+				((JButton) me.getComponent()).setBackground(new Color(255, 255, 255));
+				((JButton) me.getComponent()).setEnabled(false);
+				if(mineBoard.fetchSquareCount(new Point(i, j))!=0)
+					gridArr[i][j].setText(""+ mineBoard.fetchSquareCount(new Point(i, j)));
+				else
+					//The MineCount is Zero 
+					this.zeroMine(i, j);
+			}
+		}
 
-	}
+		else {
+			// if rightButton clicked
+			if (SwingUtilities.isRightMouseButton(me))
+				((JButton) me.getComponent()).setBackground(new Color(255, 0, 0));
+
+		}
+ 		
+	}//end of mouseclicked()
 
 	@Override
 	public void mouseExited(MouseEvent me) {
