@@ -103,7 +103,8 @@ public class BoardState {
 	}
 	
 	public void setSquare(Point point, Square square) {
-		this.squares[point.row][point.col] = square;
+		// copy the square for defensive programming
+		this.squares[point.row][point.col] = new Square(square);
 	}
 	
 	public Square getSquare(Point point) {
@@ -120,11 +121,13 @@ public class BoardState {
 
 	
 	public Square[][] getSquares() {
-		return squares;
+		// clone squares for defensive programming
+		return cloneSquares(this.squares);
 	}
 	
 	public void setSquares(Square squares[][]) {
-		this.squares = squares;
+		// clone all the squares for defensive programming		
+		this.squares = cloneSquares(squares);
 	}
 	
 	@Override
@@ -144,4 +147,14 @@ public class BoardState {
 		return buff.toString();
 	}
 	
+	private Square[][] cloneSquares(Square squares[][]) {
+		Square clonedSquares[][] = new Square[squares.length][];
+		for(int i=0; i<squares.length; i++) {
+			clonedSquares[i] = new Square[squares[i].length];
+			for(int j=0; j<squares[i].length; j++) {
+				clonedSquares[i][j] = new Square(squares[i][j]);
+			}
+		}
+		return clonedSquares;
+	}
 }

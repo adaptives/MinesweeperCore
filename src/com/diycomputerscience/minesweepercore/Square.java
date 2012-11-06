@@ -95,7 +95,6 @@ public class Square {
 	}
 	
 	public STATUS getStatus() {
-		//TODO: Is this a good idea ?
 		return (STATUS)this.currentState;
 	}
 	
