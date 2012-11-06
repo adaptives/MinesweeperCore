@@ -7,42 +7,30 @@ public class Board {
 
 	public static final int MAX_COLS = 6;
 	public static final int MAX_ROWS = 6;
-	
-	private PersistenceStrategy persistenceStrategy;
-	private Initializer boardInitializer;
+		
 	private BoardState boardState;
 	
 	public Board() {		
 		
 	}
 	
-	public Board(Initializer boardInitializer) {
-		this.boardInitializer = boardInitializer;
-		
+	public Board(Initializer boardInitializer) {			
 		this.boardState = new BoardState(MAX_ROWS, MAX_COLS);
 		this.boardState.init();
-		this.boardState.markMines(this.boardInitializer.mines());						
+		this.boardState.markMines(boardInitializer.mines());						
 		this.boardState.computeCounts();
 	}
 	
-	public void setPersistenceStrategy(PersistenceStrategy persistenceStrategy) {
-		this.persistenceStrategy = persistenceStrategy;
-	}
-	
-	public PersistenceStrategy getPersistenceStrategy() {
-		return this.persistenceStrategy;
-	}
-
 	/**
 	 * Save the current state of the board to some persistent storage 
 	 */
 	public void save() throws IOException, PersistenceException {
-		this.persistenceStrategy.save(this.boardState.getSquares());
+		MinesweeperConfig.getInstance().getPersistenceStrategy().save(this.boardState.getSquares());
 	}
 	
 	public void load() throws PersistenceException {
 		this.boardState = new BoardState(MAX_ROWS, MAX_COLS);
-		boardState.setSquares(this.persistenceStrategy.load());
+		boardState.setSquares(MinesweeperConfig.getInstance().getPersistenceStrategy().load());
 		this.boardState.computeCounts();
 	}
 	
