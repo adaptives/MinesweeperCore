@@ -33,14 +33,6 @@ public class Board {
 		return this.persistenceStrategy;
 	}
 
-	public void setSquare(Point point, Square square) {
-		this.boardState.setSquare(point, square);
-	}
-	
-	public Square getSquare(Point point) {
-		return this.boardState.getSquare(point);		
-	}
-
 	/**
 	 * Save the current state of the board to some persistent storage 
 	 */
