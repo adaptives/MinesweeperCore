@@ -63,6 +63,13 @@ public class Square {
 	private boolean mine;
 	private SquareState currentState;
 	
+	// copy constructor
+	public Square(Square square) {
+		this.count = square.count;
+		this.mine = square.mine;
+		this.currentState = square.currentState;
+	}
+	
 	public Square() {
 		this.currentState = STATUS.COVERED;
 	}
