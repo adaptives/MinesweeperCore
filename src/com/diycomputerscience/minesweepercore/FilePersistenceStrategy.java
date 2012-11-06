@@ -1,12 +1,9 @@
 package com.diycomputerscience.minesweepercore;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.diycomputerscience.minesweepercore.Square.STATUS;
 
 
 /**
