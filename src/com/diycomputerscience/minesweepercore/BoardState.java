@@ -54,6 +54,53 @@ public class BoardState {
 				}
 			}
 		}
+	}		
+	
+	public void setSquare(Point point, Square square) {
+		// copy the square for defensive programming
+		this.squares[point.row][point.col] = new Square(square);
+	}
+	
+	public Square getSquare(Point point) {
+		return this.squares[point.row][point.col];
+	}		
+	
+	public Square[][] getSquares() {
+		// clone squares for defensive programming
+		return cloneSquares(this.squares);
+	}
+	
+	public void setSquares(Square squares[][]) {
+		// clone all the squares for defensive programming		
+		this.squares = cloneSquares(squares);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		for(int row = 0; row < MAX_ROWS; row++) {
+			for(int col = 0; col < MAX_COLS; col++) {
+				Square square = this.squares[row][col];
+				if(square.isMine()) {
+					buff.append(" X " + "\n");
+				} else {					
+					buff.append(" " + square.getCount() + " ");
+				}				
+			}
+			buff.append("\n");
+		}
+		return buff.toString();
+	}
+	
+	private Square[][] cloneSquares(Square squares[][]) {
+		Square clonedSquares[][] = new Square[squares.length][];
+		for(int i=0; i<squares.length; i++) {
+			clonedSquares[i] = new Square[squares[i].length];
+			for(int j=0; j<squares[i].length; j++) {
+				clonedSquares[i][j] = new Square(squares[i][j]);
+			}
+		}
+		return clonedSquares;
 	}
 	
 	private List<Point> computeValidNeighbours(Point p) {		
@@ -98,17 +145,7 @@ public class BoardState {
 			validNeighbours.add(left);
 		}
 		
-		return validNeighbours;
-		
-	}
-	
-	public void setSquare(Point point, Square square) {
-		// copy the square for defensive programming
-		this.squares[point.row][point.col] = new Square(square);
-	}
-	
-	public Square getSquare(Point point) {
-		return this.squares[point.row][point.col];
+		return validNeighbours;		
 	}
 	
 	private boolean pointValid(Point p) {		
@@ -117,44 +154,5 @@ public class BoardState {
 		} else {			
 			return false;
 		}
-	}
-
-	
-	public Square[][] getSquares() {
-		// clone squares for defensive programming
-		return cloneSquares(this.squares);
-	}
-	
-	public void setSquares(Square squares[][]) {
-		// clone all the squares for defensive programming		
-		this.squares = cloneSquares(squares);
-	}
-	
-	@Override
-	public String toString() {
-		StringBuffer buff = new StringBuffer();
-		for(int row = 0; row < MAX_ROWS; row++) {
-			for(int col = 0; col < MAX_COLS; col++) {
-				Square square = this.squares[row][col];
-				if(square.isMine()) {
-					buff.append(" X " + "\n");
-				} else {					
-					buff.append(" " + square.getCount() + " ");
-				}				
-			}
-			buff.append("\n");
-		}
-		return buff.toString();
-	}
-	
-	private Square[][] cloneSquares(Square squares[][]) {
-		Square clonedSquares[][] = new Square[squares.length][];
-		for(int i=0; i<squares.length; i++) {
-			clonedSquares[i] = new Square[squares[i].length];
-			for(int j=0; j<squares[i].length; j++) {
-				clonedSquares[i][j] = new Square(squares[i][j]);
-			}
-		}
-		return clonedSquares;
 	}
 }
