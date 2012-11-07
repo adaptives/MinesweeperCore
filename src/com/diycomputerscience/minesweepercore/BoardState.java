@@ -21,6 +21,8 @@ public class BoardState {
 		this.squares = new Square[MAX_ROWS][MAX_COLS];
 	}
 	
+	// init is a separate method because we might want to initialize the squares
+	// to a pre-existing state from saved data
 	public void init() {
 		//instantiate all square
 		for(int row=0; row<MAX_COLS; row++) {
