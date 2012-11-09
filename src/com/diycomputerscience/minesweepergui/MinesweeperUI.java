@@ -10,12 +10,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import org.apache.log4j.Logger;
 
 import com.diycomputerscience.minesweepercore.Board;
 import com.diycomputerscience.minesweepercore.Point;
@@ -37,11 +41,17 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	
 	private Board mineBoard;
 	
-
+	private static final Logger cLogger = Logger.getLogger(MinesweeperUI.class);
+	private ResourceBundle resourceBundle;
 	
 	public MinesweeperUI() 
 	{
-		this.setTitle("Minesweeper");
+		try {
+			this.resourceBundle = ResourceBundle.getBundle("MessageBundle");
+		} catch(MissingResourceException mre) {
+			cLogger.warn("Could not locate MessageBundle file" + mre);
+		}
+		this.setTitle(resourceBundle.getString("name"));
 		this.setLayout(new GridLayout(1, 1));
 		mineBoard = new Board(new RandomBoardInitializer());
 		this.setMineLayout(mineBoard);
@@ -93,7 +103,10 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 							if (MinesweeperUI.this.mineBoard.isSquareMine(new Point(i, j))) 
 							{
 								// Exit the game
-								option = JOptionPane.showConfirmDialog(MinesweeperUI.this,"You have Lost The Game,want to play again","Really Quit",JOptionPane.YES_NO_OPTION);
+								option = JOptionPane.showConfirmDialog(MinesweeperUI.this,
+																	   resourceBundle.getString("gameover.dialogue.msg"),
+																	   resourceBundle.getString("gameover.dialogue.msg.title"),
+																	   JOptionPane.YES_NO_OPTION);
 								if(option == JOptionPane.NO_OPTION)
 								{
 									MinesweeperUI.this.dispose();
