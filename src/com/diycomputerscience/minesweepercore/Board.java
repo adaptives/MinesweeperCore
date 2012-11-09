@@ -2,23 +2,31 @@ package com.diycomputerscience.minesweepercore;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 
 public class Board {
 
 	public static final int MAX_COLS = 6;
 	public static final int MAX_ROWS = 6;
-		
+	
+	private static final Logger cLogger = Logger.getLogger(Board.class);
+	
 	private BoardState boardState;
 	
 	public Board() {		
 		
 	}
 	
-	public Board(Initializer boardInitializer) {			
+	public Board(Initializer boardInitializer) {
+		cLogger.debug("Creating board");
 		this.boardState = new BoardState(MAX_ROWS, MAX_COLS);
 		this.boardState.init();
-		this.boardState.markMines(boardInitializer.mines());						
+		cLogger.debug("Initialized board");
+		this.boardState.markMines(boardInitializer.mines());
+		cLogger.debug("Marked mines using " + boardInitializer.getClass().getName());
 		this.boardState.computeCounts();
+		cLogger.debug("Computed counts");
 	}
 	
 	/**

@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * 
@@ -21,6 +23,8 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 
 	private FileConnectionFactory fileConnectionFactory;
 	
+	private static final Logger cLogger = Logger.getLogger(FilePersistenceStrategy.class);
+	
 	public FilePersistenceStrategy(FileConnectionFactory fileConnectionfacory) {
 		this.fileConnectionFactory = fileConnectionfacory;
 	}
@@ -28,6 +32,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 	@Override
 	public void save(Square squares[][]) throws PersistenceException {
 		try {
+			cLogger.debug("Saving current board state to file " );
 			PrintWriter writer = getWriter();
 			for(int row=0; row<Board.MAX_ROWS; row++) {
 				for(int col=0; col<Board.MAX_COLS; col++) {
@@ -40,6 +45,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 					writer.println(squareRep);
 				}
 			}
+			cLogger.debug("Completed saving board state to file");
 		} catch(Exception e) {
 			String msg = "Could not save the board";
 			throw new PersistenceException(msg, e);
@@ -56,6 +62,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 		Square squares[][] = new Square[Board.MAX_ROWS][Board.MAX_COLS];
 		
 		try {
+			cLogger.debug("Loading board state");
 			// Get a reader to the file
 			BufferedReader reader = getReader();
 			// Compile the regex pattern
@@ -86,6 +93,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 				square.setStatus(status);
 				squares[row][col] = square;
 			}
+			cLogger.debug("Completed loading board state");
 		} catch(Exception ioe) {
 			String msg = "Could not load persisted state of the board";
 			throw new PersistenceException(msg, ioe);
