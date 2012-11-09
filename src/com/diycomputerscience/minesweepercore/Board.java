@@ -32,7 +32,7 @@ public class Board {
 	/**
 	 * Save the current state of the board to some persistent storage 
 	 */
-	public void save() throws IOException, PersistenceException {
+	public void save() throws PersistenceException {
 		MinesweeperConfig.getInstance().getPersistenceStrategy().save(this.boardState.getSquares());
 	}
 	
