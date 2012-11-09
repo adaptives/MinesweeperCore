@@ -32,7 +32,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 	@Override
 	public void save(Square squares[][]) throws PersistenceException {
 		try {
-			cLogger.debug("Saving current board state to file " );
+			cLogger.debug("Saving current board state to file '" + this.fileConnectionFactory.getFileName()+ "'");
 			PrintWriter writer = getWriter();
 			for(int row=0; row<Board.MAX_ROWS; row++) {
 				for(int col=0; col<Board.MAX_COLS; col++) {
@@ -62,7 +62,7 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 		Square squares[][] = new Square[Board.MAX_ROWS][Board.MAX_COLS];
 		
 		try {
-			cLogger.debug("Loading board state");
+			cLogger.debug("Loading board state from file '" + this.fileConnectionFactory.getFileName()+ "'");
 			// Get a reader to the file
 			BufferedReader reader = getReader();
 			// Compile the regex pattern

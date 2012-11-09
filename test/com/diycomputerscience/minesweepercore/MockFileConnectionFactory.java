@@ -27,4 +27,7 @@ public class MockFileConnectionFactory implements FileConnectionFactory {
 		return this.reader;
 	}
 
+	public String getFileName() {
+		return null;
+	}
 }

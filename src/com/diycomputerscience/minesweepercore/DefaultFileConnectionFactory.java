@@ -21,5 +21,7 @@ public class DefaultFileConnectionFactory implements FileConnectionFactory {
 			return new BufferedReader(new FileReader(this.persistenceFileName));
 		}
 
-
+		public String getFileName() {
+			return this.persistenceFileName;
+		}
 }
