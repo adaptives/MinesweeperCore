@@ -1,6 +1,7 @@
 package com.diycomputerscience.minesweepercore;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +32,10 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 	
 	@Override
 	public void save(Square squares[][]) throws PersistenceException {
+		PrintWriter writer = null;
 		try {
 			cLogger.debug("Saving current board state to file '" + this.fileConnectionFactory.getFileName()+ "'");
-			PrintWriter writer = getWriter();
+			writer = getWriter();
 			for(int row=0; row<Board.MAX_ROWS; row++) {
 				for(int col=0; col<Board.MAX_COLS; col++) {
 					Square square = squares[row][col];
@@ -49,6 +51,10 @@ public class FilePersistenceStrategy implements PersistenceStrategy {
 		} catch(Exception e) {
 			String msg = "Could not save the board";
 			throw new PersistenceException(msg, e);
+		} finally {
+			if(writer != null) {
+				writer.close();
+			}
 		}
 	}
 

@@ -14,5 +14,5 @@ import java.io.PrintWriter;
 public interface FileConnectionFactory {
 	public PrintWriter getWriter() throws IOException;
 	public BufferedReader getReader() throws IOException;
-	public String getFileName();
+	public String getFileName() throws IOException;
 }

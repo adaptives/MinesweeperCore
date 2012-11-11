@@ -38,7 +38,7 @@ public class Board {
 	
 	public void load() throws PersistenceException {
 		this.boardState = new BoardState(MAX_ROWS, MAX_COLS);
-		boardState.setSquares(MinesweeperConfig.getInstance().getPersistenceStrategy().load());
+		this.boardState.setSquares(MinesweeperConfig.getInstance().getPersistenceStrategy().load());
 		this.boardState.computeCounts();
 	}
 	
