@@ -1,6 +1,8 @@
 package com.diycomputerscience.minesweepercore;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -40,6 +42,52 @@ public class Board {
 		this.boardState = new BoardState(MAX_ROWS, MAX_COLS);
 		this.boardState.setSquares(MinesweeperConfig.getInstance().getPersistenceStrategy().load());
 		this.boardState.computeCounts();
+	}
+	
+	public List<Point> neighbours(Point p) {
+		List<Point> neighbours = new ArrayList<Point>();
+		
+		// top left
+		if(p.row - 1 >= 0 && p.col -1 >= 0) {
+			neighbours.add(new Point(p.row-1, p.col-1));
+		}
+		
+		// top
+		if(p.row - 1 >= 0) {
+			neighbours.add(new Point(p.row-1, p.col));
+		}
+		
+		// top right
+		if(p.row - 1 >= 0 && p.col + 1 < Board.MAX_COLS) {
+			neighbours.add(new Point(p.row-1, p.col+1));
+		}
+		
+		// right
+		if(p.col + 1 < Board.MAX_COLS) {
+			neighbours.add(new Point(p.row, p.col+1));
+		}
+		
+		// bottom right
+		if(p.row + 1 < Board.MAX_ROWS && p.col + 1 < Board.MAX_COLS) {
+			neighbours.add(new Point(p.row+1, p.col+1));
+		}
+		
+		// bottom
+		if(p.row + 1 < Board.MAX_ROWS) {
+			neighbours.add(new Point(p.row+1, p.col));
+		}
+		
+		// bottom left
+		if(p.row + 1 < Board.MAX_ROWS && p.col - 1 >= 0) {
+			neighbours.add(new Point(p.row+1, p.col-1));
+		}
+		
+		// left
+		if(p.col - 1 >= 0) {
+			neighbours.add(new Point(p.row, p.col-1));
+		}
+		
+		return neighbours;
 	}
 	
 	//all ops that can be done on this board
