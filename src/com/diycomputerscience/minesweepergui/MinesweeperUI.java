@@ -6,15 +6,22 @@ package com.diycomputerscience.minesweepergui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -22,6 +29,8 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import com.diycomputerscience.minesweepercore.Board;
+import com.diycomputerscience.minesweepercore.ConfigUtils;
+import com.diycomputerscience.minesweepercore.PersistenceException;
 import com.diycomputerscience.minesweepercore.Point;
 import com.diycomputerscience.minesweepercore.RandomBoardInitializer;
 import com.diycomputerscience.minesweepercore.UncoveredMineException;
@@ -40,7 +49,7 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	final int col = 6;
 	
 	private Board mineBoard;
-	
+		
 	private static final Logger cLogger = Logger.getLogger(MinesweeperUI.class);
 	private ResourceBundle resourceBundle;
 	
@@ -55,8 +64,8 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 		this.setLayout(new GridLayout(1, 1));
 		mineBoard = new Board(new RandomBoardInitializer());
 		this.setMineLayout(mineBoard);
-		this.addWindowListener();
-		
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setJMenuBar(buildMenuBar());		
 	}
 
 	/**
@@ -64,7 +73,7 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	 * the grid
 	 */
 	private void setMineLayout(Board mineBoard) 
-	{
+	{									
 		JPanel panel;
 		panel = new JPanel();
 		panel.setLayout(new GridLayout(row, col));
@@ -158,19 +167,57 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	}// setMineLayout()
 
 	
-	/**
-	 * This method adds Window closing listener
-	 */
-	private void addWindowListener() {
-		this.addWindowListener(new WindowAdapter() {
+	private JMenuBar buildMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+		
+		JMenu file = new JMenu("File");
+		JMenuItem fileSave = new JMenuItem("Save");
+		fileSave.addActionListener(new ActionListener() {
 			@Override
-			public void windowClosing(WindowEvent we) {
-				System.exit(DISPOSE_ON_CLOSE);
-			}
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					mineBoard.save();
+				} catch(PersistenceException pe) {
+					cLogger.warn("Could not save the game", pe);
+				}
+			}		
 		});
+		JMenuItem fileLoad = new JMenuItem("Load");
+		fileLoad.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					MinesweeperUI.this.getContentPane().removeAll();
+					MinesweeperUI.this.invalidate();
+					MinesweeperUI.this.mineBoard.load();
+					MinesweeperUI.this.setMineLayout(MinesweeperUI.this.mineBoard);
+				} catch(PersistenceException pe) {
+					//TODO: error dialogue
+					//TODO: This button should be enabled only if a previously saved state exists
+					cLogger.warn("Could not load game from previously saved state");
+				}
+			}			
+		});
+		JMenuItem close = new JMenuItem("Close");
+		close.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {			
+				System.exit(0);
+			}		
+		});
+		file.add(fileSave);
+		file.add(fileLoad);
+		file.add(close);
+		menuBar.add(file);
+		
+		JMenu help = new JMenu("Help");
+		JMenuItem helpAbout = new JMenuItem("About");
+		help.add(helpAbout);
+		menuBar.add(help);
+		
+		return menuBar;
+	}
 
-	}// addWindowListener()
-	
 	/**
 	 * 
 	 * @param com Contains the array of JButton components
@@ -523,10 +570,11 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	}//zeroMine()
 
 	public static void main(String args[]) {
+		ConfigUtils.initConfigDirectory();		
 		// Create a JFrame and init it here
 		MinesweeperUI MUI = new MinesweeperUI();
 		MUI.setSize(300, 300);
 		MUI.setVisible(true);
 		
 	}//main()
-}//class
+}//class 
