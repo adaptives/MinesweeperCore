@@ -143,6 +143,7 @@ public class FilePersistenceStrategyTest {
 		writer.println(capture(captureOfString));
 		//Note: It is last call 36 times, and NOT last call + 36 times
 		expectLastCall().times(36);
+		writer.close();
 		replay(writer);
 					
 		MockFileConnectionFactory mockFileConnectionFactory = new MockFileConnectionFactory(reader, writer);
