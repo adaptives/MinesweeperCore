@@ -8,6 +8,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	BoardTest.class,
+	NeighboursTest.class,
 	BoardStateTest.class,
 	SquareTest.class,
 	FilePersistenceStrategyTest.class
