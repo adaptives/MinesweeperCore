@@ -10,10 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -39,11 +36,8 @@ import com.diycomputerscience.minesweepercore.UncoveredMineException;
  * 
  */
 
-public class MinesweeperUI extends JFrame //implements MouseListener 
-{
-	/**
-	 * 
-	 */
+public class MinesweeperUI extends JFrame {
+	
 	private static final long serialVersionUID = 1L;
 	final int row = 6;
 	final int col = 6;
@@ -53,8 +47,7 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	private static final Logger cLogger = Logger.getLogger(MinesweeperUI.class);
 	private ResourceBundle resourceBundle;
 	
-	public MinesweeperUI() 
-	{
+	public MinesweeperUI() {
 		try {
 			this.resourceBundle = ResourceBundle.getBundle("MessageBundle");
 		} catch(MissingResourceException mre) {
@@ -72,8 +65,7 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	 * This method sets the layoutManager to Panel and creates the Buttons for
 	 * the grid
 	 */
-	private void setMineLayout(Board mineBoard) 
-	{									
+	private void setMineLayout(Board mineBoard) {									
 		JPanel panel;
 		panel = new JPanel();
 		panel.setLayout(new GridLayout(row, col));
@@ -81,67 +73,41 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 		/** In this for loop create the Buttons and populate the Button Array */
 		JButton gridButton;
 		
-		for (int i = 0; i < row; i++) 
-		{
-			for (int j = 0; j < col; j++) 
-			{
+		for (int i = 0; i < row; i++) {
+			for (int j = 0; j < col; j++) {
 				gridButton = new JButton("");
 				gridButton.setName(i+","+j);
-				gridButton.addMouseListener(new MouseAdapter()
-				{
+				gridButton.addMouseListener(new MouseAdapter() {
 					@Override
-					public void mouseClicked(MouseEvent me) 
-					{
+					public void mouseClicked(MouseEvent me) {
 						int option =0;
 						String buttonName = ((JButton)me.getComponent()).getName();
 						StringBuffer strbuff = new StringBuffer(buttonName);
 						int index = strbuff.indexOf(",");
 						int i = Integer.parseInt(((String)strbuff.substring(0,index)));
 						int j = Integer.parseInt(((String)strbuff.substring(index+1)).toString());
-						if (SwingUtilities.isLeftMouseButton(me)) 
-						{
-							try
-							{
-										
-								MinesweeperUI.this.mineBoard.uncoverSquare(new Point(i, j));
-								
-							} catch (UncoveredMineException ue) 
-							{					
-								
-							}
-							if (MinesweeperUI.this.mineBoard.isSquareMine(new Point(i, j))) 
-							{
+						if (SwingUtilities.isLeftMouseButton(me)) {
+							try {												
+								Component comArr = MinesweeperUI.this.getContentPane().getComponent(0);
+								Component com []= ((JPanel)comArr).getComponents();
+								MinesweeperUI.this.uncoverSquareUI(com, i, j);								
+							} catch (UncoveredMineException ue) {					
 								// Exit the game
 								option = JOptionPane.showConfirmDialog(MinesweeperUI.this,
 																	   resourceBundle.getString("gameover.dialogue.msg"),
 																	   resourceBundle.getString("gameover.dialogue.msg.title"),
 																	   JOptionPane.YES_NO_OPTION);
-								if(option == JOptionPane.NO_OPTION)
-								{
-									MinesweeperUI.this.dispose();
+								if(option == JOptionPane.NO_OPTION) {
+									System.exit(0);
 								}	
-								else
-								{
+								else {
 									MinesweeperUI.this.getContentPane().removeAll();
 									MinesweeperUI.this.invalidate();
 									MinesweeperUI.this.mineBoard = new Board(new RandomBoardInitializer());
-									MinesweeperUI.this.setMineLayout(MinesweeperUI.this.mineBoard);
-									
+									MinesweeperUI.this.setMineLayout(MinesweeperUI.this.mineBoard);									
 								}
-							}
-							else
-							 {
-								Component comArr = MinesweeperUI.this.getContentPane().getComponent(0);
-								Component com []= ((JPanel)comArr).getComponents();
-								if(MinesweeperUI.this.isMineCountZero(com,i,j))
-								{
-									//The MineCount is Zero 
-									MinesweeperUI.this.zeroMine(i, j);
-								}
-							}
-						}
-
-						else {
+							}							
+						} else {
 							// if rightButton clicked
 							if (SwingUtilities.isRightMouseButton(me))
 							{
@@ -149,13 +115,8 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 								
 								MinesweeperUI.this.mineBoard.markSquareAsMine(new Point(i,j));
 							}
-
-						}
-				 		
+						}				 		
 					}//end of mouseclicked()
-
-
- 
 				});
 				
 				panel.add(gridButton);
@@ -226,349 +187,41 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 	 * 
 	 * This method match the row and column with the button name and if found it sets the minecount
 	 * and changes its background color and enabled= false
+	 * @throws UncoveredMineException 
 	 */
-	private void checkButtonName(Component com[],int row,int col)
-	{
-		for(int a=0; a < com.length;a++)
-		{
-			if(com[a].getName().equals(row+","+col))
-			{
+	private void uncoverSquareUI(Component com[],int row,int col) throws UncoveredMineException {
+		for(int a=0; a < com.length;a++) {
+			if(com[a].getName().equals(row+","+col)) {
 				((JButton)com[a]).setText(""+mineBoard.fetchSquareCount(new Point(row, col)));
 				((JButton)com[a]).setBackground(new Color(255, 255, 255));
 				((JButton)com[a]).setEnabled(false);
+				Point p = new Point(row, col);
+				this.mineBoard.uncoverSquare(p);
+				if(this.mineBoard.fetchSquareCount(p) == 0) {
+					List<Point> neighbours = this.mineBoard.neighbours(p);
+					for(Point zeroP : neighbours) {
+						if(componentEnabled(com, zeroP.row, zeroP.col)) {
+							uncoverSquareUI(com, zeroP.row, zeroP.col);
+						}						
+					}
+				}
 				return;
 			}	
 		}
-	}//end of checkButtonName()
-	
-	/**
-	 * 
-	 * @param com Contains the array of JButton components
-	 * @param row the row on which user has clicked
-	 * @param col the col on which user has clicked
-	 * @return
-	 */
-	private boolean isMineCountZero(Component com[],int row,int col)
-	{
-		for(int a=0; a < com.length;a++)
-		{
-			if(com[a].getName().equals(row+","+col))
-			{
-				if(mineBoard.fetchSquareCount(new Point(row, col))!=0)
-				{
-					((JButton)com[a]).setText(""+ mineBoard.fetchSquareCount(new Point(row, col)));
-					((JButton)com[a]).setBackground(new Color(255, 255, 255));
-					((JButton)com[a]).setEnabled(false);
-					
-					return false;
-				}
-				
-			}	
-			
-		}
-		return true;
-	}//isMineCountZero()
-	
-	private boolean componentEnabled(Component com[],int row,int col)
-	{
-		for(int a=0; a < com.length;a++)
-		{
-			if(com[a].getName().equals(row+","+col))
-			{
-				if(((JButton)com[a]).isEnabled())
-				{
-					return true;
-				}
-			}//if
-		
-		}//for	
-		
-		return false;
 	}
 	
-	private void fetchAndCall(Component com[],int row,int col)
-	{
-		if(mineBoard.fetchSquareCount(new Point(row, col)) == 0)
-		{
-			zeroMine(row, col);
-		}
-		else
-		{
-			this.checkButtonName(com,row,col);
-		}
-	}//end of fetchAndCall
-	
-	private void zeroMine(int row,int col)
-	{
-		Component comArr = this.getContentPane().getComponent(0);
-		Component com []= ((JPanel)comArr).getComponents();
-	
-		if(row == 0 && col == 0)
-		{
-			this.checkButtonName(com,row,col);	
-		
-			if(this.componentEnabled(com,row,col+1))
-			{	
-				this.fetchAndCall(com,row,col+1);
-			
-			}
-				
-			if(this.componentEnabled(com,row+1,col))
-			{	
-			
-				this.fetchAndCall(com,row+1,col);
-			}
-			
-			if(this.componentEnabled(com,row+1,col+1))
-			{
-				this.fetchAndCall(com,row+1,col+1);
-			}
-			return;
-		}
-		
-
-		if(row ==0 && col == Board.MAX_COLS-1)
-		{
-				this.checkButtonName(com,row,col);
-				if(this.componentEnabled(com,row,col-1))
-				{
-					this.fetchAndCall(com,row,col-1);
+	private boolean componentEnabled(Component com[],int row,int col) {
+		for(int a=0; a < com.length;a++) {
+			if(com[a].getName().equals(row+","+col)) {
+				if(((JButton)com[a]).isEnabled()) {
+					return true;
 				}
-				
-				if(this.componentEnabled(com,row+1,col-1))
-				{
-					this.fetchAndCall(com,row+1,col-1);
-				}
-				
-				if(this.componentEnabled(com,row+1,col))
-				{
-					this.fetchAndCall(com,row+1,col);
-				}
-				
-				return;
-			}
-		if(row == 0 && (col > 0 && col <= ( Board.MAX_COLS-2)) )
-		{
-			
-			this.checkButtonName(com,row,col);
-			if(this.componentEnabled(com,row,col-1))
-			{
-				this.fetchAndCall(com,row,col-1);
-			}
-			if(this.componentEnabled(com,row,col+1))
-			{
-				this.fetchAndCall(com,row,col+1);
-			}
-			
-			if(this.componentEnabled(com,row+1,col-1))
-			{
-				this.fetchAndCall(com,row+1,col-1);
-			}
-			if(this.componentEnabled(com,row+1,col))
-			{
-				this.fetchAndCall(com,row+1,col);
-			}
-			
-			if(this.componentEnabled(com,row+1,col+1))
-			{
-				this.fetchAndCall(com,row+1,col+1);
-			}
-			return;
-		}
-		if((row <=(Board.MAX_ROWS-2)&& row > 0) && col == 0)
-		{
-			
-			this.checkButtonName(com,row,col);
-			
-			
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
-			}
-				
-			
-			if(this.componentEnabled(com,row-1,col+1))
-			{
-				this.fetchAndCall(com,row-1,col+1);
-			}
-			
-			if(this.componentEnabled(com,row,col+1))
-			{
-				this.fetchAndCall(com,row,col+1);
-			}
-			
-			if(this.componentEnabled(com,row+1,col))
-			{
-				this.fetchAndCall(com,row+1,col);
-			}
-			if(this.componentEnabled(com,row+1,col+1))
-			{
-				this.fetchAndCall(com,row+1,col+1);
-			}
-			
-			return;
-		}
-		if(row ==(Board.MAX_ROWS-1) && col == 0)
-		{
-			this.checkButtonName(com,row,col);
-			
-		
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
 			}
 		
-			if(this.componentEnabled(com,row-1,col+1))
-			{
-				this.fetchAndCall(com,row-1,col+1);
-			}
-			
-			if(this.componentEnabled(com,row,col+1))
-			{
-				this.fetchAndCall(com,row,col+1);
-			}
-			return;
-		}
-		if(row ==(Board.MAX_ROWS-1) &&( col > 0 && col <= Board.MAX_COLS-2))
-		{
-			this.checkButtonName(com,row,col);
-			
-			
-			if(this.componentEnabled(com,row-1,col-1))
-			{
-				this.fetchAndCall(com,row-1,col-1);
-			}
-			
-			
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
-			}
-			
-			
-			if(this.componentEnabled(com,row-1,col+1))
-			{
-				this.fetchAndCall(com,row-1,col+1);
-			}
-			
-			
-			if(this.componentEnabled(com,row,col-1))
-			{
-			
-				this.fetchAndCall(com,row,col-1);
-			}
-			
-			if(this.componentEnabled(com,row,col+1))
-			{
-				this.fetchAndCall(com,row,col+1);
-			
-			}
-			return;
-		}
-		if(row ==(Board.MAX_ROWS-1) && col == (Board.MAX_COLS-1))
-		{
-			
-			this.checkButtonName(com,row,col);
-			
-			if(this.componentEnabled(com,row-1,col-1))
-			{
-				this.fetchAndCall(com,row-1,col-1);
-			}
-			
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
-			}
-			
-			if(this.componentEnabled(com,row,col-1))
-			{
-				this.fetchAndCall(com,row,col-1);
-			}
-			
-			return;
-		}
-		if((row <=(Board.MAX_ROWS-2 ) && row >0) && col == (Board.MAX_COLS-1))//**check this cond
-		{
-			this.checkButtonName(com,row,col);
-			
-			if(this.componentEnabled(com,row-1,col-1))
-			{
-				this.fetchAndCall(com,row-1,col-1);
-			}
-			
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
-			}
-			
-			if(this.componentEnabled(com,row,col-1))
-			{
-				this.fetchAndCall(com,row,col-1);
-			}
-			
-			
-			if(this.componentEnabled(com,row+1,col-1))
-			{
-				this.fetchAndCall(com,row+1,col-1);
-			}
-			
-			if(this.componentEnabled(com,row+1,col))
-			{
-				this.fetchAndCall(com,row+1,col);
-			
-			}
-			
-			return;
-		}
-		if((row <=(Board.MAX_ROWS-2) && row > 0) && (col <= (Board.MAX_COLS-2) && col > 0))
-		{
-			this.checkButtonName(com,row,col);
-			
-			if(this.componentEnabled(com,row-1,col-1))
-			{
-				this.fetchAndCall(com,row-1,col-1);
-			}
-			
-			if(this.componentEnabled(com,row-1,col))
-			{
-				this.fetchAndCall(com,row-1,col);
-			}
-			
-			if(this.componentEnabled(com,row-1,col+1))
-			{
-				this.fetchAndCall(com,row-1,col+1);
-			}
-			
-			if(this.componentEnabled(com,row,col+1))
-			{
-				this.fetchAndCall(com,row,col+1);
-			}
-			
-			if(this.componentEnabled(com,row,col-1))
-			{
-				this.fetchAndCall(com,row,col-1);
-			}
-			
-			
-			if(this.componentEnabled(com,row+1,col+1))
-			{
-				this.fetchAndCall(com,row+1,col+1);
-			}
-			
-			if(this.componentEnabled(com,row+1,col-1))
-			{
-				this.fetchAndCall(com,row+1,col-1);
-			}
-			
-			if(this.componentEnabled(com,row+1,col))
-			{
-				this.fetchAndCall(com,row+1,col);
-			}
-			return;
-		}
+		}			
+		return false;
+	}
 		
-	}//zeroMine()
-
 	public static void main(String args[]) {
 		ConfigUtils.initConfigDirectory();		
 		// Create a JFrame and init it here
@@ -576,5 +229,5 @@ public class MinesweeperUI extends JFrame //implements MouseListener
 		MUI.setSize(300, 300);
 		MUI.setVisible(true);
 		
-	}//main()
-}//class 
+	}
+}
