@@ -27,10 +27,10 @@ public class RandomBoardInitializer implements Initializer {
 	
 	private List<Point> getRandonMinesForRow(int row, int mines) {
 		List<Point> points = new ArrayList<Point>();
-		for(int j=0; j<mines; j++) {
-			int col = getMineCountForThisRow(); 
+		for(int j=0; j<mines; j++) {			
 			boolean addedMine = false;
 			while(!addedMine) {
+				int col = getMineCountForThisRow();
 				Point mine = new Point(row, col);					
 				if(!points.contains(mine)) {
 					points.add(mine);
