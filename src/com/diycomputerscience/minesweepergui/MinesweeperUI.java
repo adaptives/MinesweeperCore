@@ -228,6 +228,5 @@ public class MinesweeperUI extends JFrame {
 		MinesweeperUI MUI = new MinesweeperUI();
 		MUI.setSize(300, 300);
 		MUI.setVisible(true);
-		
 	}
 }
